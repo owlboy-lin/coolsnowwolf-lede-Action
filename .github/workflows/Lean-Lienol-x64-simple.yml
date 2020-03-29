@@ -5,7 +5,7 @@
 # Author: P3TERX
 # Blog: https://p3terx.com
 #=================================================
-name: Lean-openwrt-x64-simple
+name: Lean-Lienol-x64-simple
 
 
 on:
@@ -15,8 +15,8 @@ on:
     branches: 
       - master
     paths:
-      - '.github/workflows/Lean-openwrt-x64-simple.yml'
-      - 'Lean-openwrt-x64-simple'
+      - '.github/workflows/Lean-Lienol-x64-simple.yml'
+      - 'Lean-Lienol-x64-simple'
 
   watch:
     types: [started]
@@ -25,14 +25,15 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  FIRMWARE_NAME: Lean-openwrt-x64-simple
-  CONFIG_FILE: Lean-openwrt-x64-simple
+  FIRMWARE_NAME: Lean-Lienol-x64-simple
+  CONFIG_FILE: Lean-Lienol-x64-simple
   DIY_SH: diy.sh
   TARGET: x86
   SUBTARGET: 64
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
+  UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
   
@@ -171,19 +172,58 @@ jobs:
           rm -rf packages
           echo "::set-env name=FIRMWARE::$PWD"
           echo "::set-output name=status::success"
+          
                     
       - name: Upload firmware directory
+        id: upload_firmware
         uses: actions/upload-artifact@master
         if: steps.organize.outputs.status == 'success'
         with:
           name: ${{ steps.rename.outputs.release_tag }}
-          path: openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
+          # path: openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
+          path: ${{ env.FIRMWARE }}
           
-      - name: Upload to release
-        uses: softprops/action-gh-release@master
-        if: env.UPLOAD_RELEASE == 'true' && startsWith(github.ref, 'refs/tags/')
+      - name: Generate tag
+        run: |
+          echo ::set-env name=RELEASE_TAG::"$(TZ=UTC-8 date +"%Y.%m.%d")"
+          
+#      - name: Create release
+#        uses: softprops/action-gh-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+#        with:
+#          tag_name: ${{ env.RELEASE_TAG }}
+#          body: 🚀 Automated build | 自动编译
+          
+#      - name: Upload to release
+#        uses: softprops/action-gh-release@v1
+#        if: env.UPLOAD_RELEASE == 'true' 
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+#        with:
+#          tag_name: ${{ steps.organize.outputs.RELEASE_TAG }}
+#          body: 🚀 Automated build | 自动编译
+#          files: ${{ env.FIRMWARE }}/*
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          files: ${{ env.FIRMWARE }}/*
+          tag_name: ${{ env.FIRMWARE_NAME }}
+          release_name: ${{ env.RELEASE_TAG }}
+          body: 🚀 Automated build | 自动编译
+          draft: false
+          prerelease: false
 
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ${{ env.FIRMWARE }}/*
+          asset_name: ${{ steps.rename.outputs.release_tag }}
+          asset_content_type: application/zip
