@@ -30,7 +30,7 @@ env:
   DIY_SH: diy.sh
   TARGET: x86
   SUBTARGET: 64
-  SSH_ACTIONS: true
+  SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
