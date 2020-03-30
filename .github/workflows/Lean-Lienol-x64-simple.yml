@@ -30,7 +30,7 @@ env:
   DIY_SH: diy.sh
   TARGET: x86
   SUBTARGET: 64
-  SSH_ACTIONS: false
+  SSH_ACTIONS: true
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
@@ -133,9 +133,9 @@ jobs:
           echo "::set-output name=status::success"
           echo "##[set-output name=release_tag;]$release_tag"
       
-      - name: SSH connection to Actions
-        uses: owlboy-lin/debugger-action@master
-        if: env.SSH_ACTIONS == 'true'      
+#      - name: SSH connection to Actions
+#        uses: owlboy-lin/debugger-action@master
+#        if: env.SSH_ACTIONS == 'true'      
     
       - name: Gz Files
         id: Gzip_file
@@ -198,6 +198,10 @@ jobs:
           body: 🚀 Automated build | 自动编译
           draft: false
           prerelease: false
+          
+      - name: SSH connection to Actions
+        uses: owlboy-lin/debugger-action@master
+        if: env.SSH_ACTIONS == 'true'   
  
       - name: Upload Release Asset
         id: upload-release-asset
