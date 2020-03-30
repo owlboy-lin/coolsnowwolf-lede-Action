@@ -186,7 +186,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: env.UPLOAD_RELEASE == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.Lean_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
           files: ${{ env.FIRMWARE }}/*
           body: 🚀 Automated build | 自动编译
