@@ -184,11 +184,17 @@ jobs:
           # path: openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
           path: ${{ env.FIRMWARE }}
 
+
+      - name: Generate tag
+        run: |
+          echo ::set-env name=date_TAG::"$(TZ=UTC-8 date +"%Y.%m.%d-%H%M%S")"
+
       - name: Upload firmware to release
         uses: softprops/action-gh-release@v1
         if: env.UPLOAD_RELEASE == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
+          tag_name: ${{ env.datel_TAG }}
           files: ${{ env.FIRMWARE }}/*
           body: 🚀 Automated build | 自动编译
