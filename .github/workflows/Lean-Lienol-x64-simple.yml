@@ -34,6 +34,7 @@ env:
   SUBTARGET: 64
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
+  UPLOAD_ZIP: true
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
@@ -174,11 +175,20 @@ jobs:
           rm -rf packages
           echo "::set-env name=FIRMWARE::$PWD"
           echo "::set-output name=status::success"
-                 
+     
+      - name: Upload zip
+        id: upload_zip
+        if: steps.organize.outputs.status == 'success' && env.UPLOAD_ZIP == 'true'
+        run: |
+          cd openwrt/bin/targets/$TARGET/$SUBTARGET
+          zip -r ${{ env.FIRMWARE }}/${{ steps.rename.outputs.release_tag }}.zip *
+          rm -f *.img
+          echo "::set-output name=status::success"   
+     
       - name: Upload firmware directory
         id: upload_firmware
         uses: actions/upload-artifact@master
-        if: steps.organize.outputs.status == 'success' && !cancelled()
+        if: steps.organize.outputs.status == 'success' && env.UPLOAD_ZIP == 'false' && !cancelled()
         with:
           name: ${{ steps.rename.outputs.release_tag }}
           # path: openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
