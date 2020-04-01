@@ -182,7 +182,6 @@ jobs:
         run: |
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
           zip -r ${{ env.FIRMWARE }}/${{ steps.rename.outputs.release_tag }}.zip *
-          rm -f *.img
           echo "::set-output name=status::success"   
      
       - name: Upload firmware directory
