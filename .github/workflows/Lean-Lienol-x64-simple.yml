@@ -195,7 +195,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
-          tag_name: 自动发布 ${{ steps.rename.outputs.release_tag }}
+          tag_name: ${{ env.date_TAG }}
+#         tag_name: 自动发布 ${{ steps.rename.outputs.release_tag }}
           release_name: ${{ steps.rename.outputs.release_tag }}
           files: ${{ env.FIRMWARE }}/*
           body: 🚀 Automated build | 自动编译
