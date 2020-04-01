@@ -189,13 +189,21 @@ jobs:
         run: |
           echo ::set-env name=date_TAG::"$(TZ=UTC-8 date +"%Y.%m.%d-%H%M%S")"
 
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
+        with:
+          tag_name: ${{ env.date_TAG }}
+          body: 🚀 Automated build | 自动编译
+
+
       - name: Upload firmware to release
         uses: softprops/action-gh-release@v1
         if: env.UPLOAD_RELEASE == 'true'
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
-          tag_name: ${{ env.date_TAG }}
+#         tag_name: ${{ env.date_TAG }}
 #         tag_name: 自动发布 ${{ steps.rename.outputs.release_tag }}
           release_name: ${{ steps.rename.outputs.release_tag }}
           files: ${{ env.FIRMWARE }}/*
-          body: 🚀 Automated build | 自动编译
