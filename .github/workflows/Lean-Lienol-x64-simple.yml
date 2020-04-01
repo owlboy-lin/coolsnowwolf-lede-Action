@@ -17,7 +17,7 @@ on:
     branches: 
       - master
     paths:
-      - '.github/workflows/Lean-Lienol-x64-simple.yml'
+ #     - '.github/workflows/Lean-Lienol-x64-simple.yml'
       - 'Lean-Lienol-x64-simple'
 
   watch:
@@ -178,7 +178,7 @@ jobs:
       - name: Upload firmware directory
         id: upload_firmware
         uses: actions/upload-artifact@master
-        if: steps.organize.outputs.status == 'success'
+        if: steps.organize.outputs.status == 'success' && !cancelled()
         with:
           name: ${{ steps.rename.outputs.release_tag }}
           # path: openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
@@ -191,10 +191,11 @@ jobs:
 
       - name: Upload firmware to release
         uses: softprops/action-gh-release@v1
-        if: env.UPLOAD_RELEASE == 'true'
+        if: env.UPLOAD_RELEASE == 'true' && startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
-          tag_name: ${{ env.date_TAG }}
+          tag_name: 自动发布 ${{ steps.rename.outputs.release_tag }}
+          release_name: ${{ steps.rename.outputs.release_tag }}
           files: ${{ env.FIRMWARE }}/*
           body: 🚀 Automated build | 自动编译
