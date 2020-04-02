@@ -181,7 +181,7 @@ jobs:
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_ZIP == 'true'
         run: |
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          zip -r ${{ env.FIRMWARE }}/${{ steps.rename.outputs.release_tag }}.zip *
+          zip -rm -T ${{ env.FIRMWARE }}/${{ steps.rename.outputs.release_tag }}.zip *
           echo "::set-output name=status::success"   
      
       - name: Upload firmware directory
@@ -204,16 +204,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
           tag_name: ${{ env.date_TAG }}
+          release_name: ${{ steps.rename.outputs.release_tag }}
           body: 🚀 Automated build | 自动编译
 
 
       - name: Upload firmware to release
         uses: softprops/action-gh-release@v1
-        if: env.UPLOAD_RELEASE == 'true'
+        if: env.UPLOAD_RELEASE == 'true' && startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
-#         tag_name: ${{ env.date_TAG }}
-#         tag_name: 自动发布 ${{ steps.rename.outputs.release_tag }}
-          release_name: ${{ steps.rename.outputs.release_tag }}
           files: ${{ env.FIRMWARE }}/*
