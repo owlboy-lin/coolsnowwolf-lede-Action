@@ -36,7 +36,7 @@ env:
   TARGET: x86
   SUBTARGET: 64
   SSH_ACTIONS: false
-  Gzip_file: false
+  Gzip_file: true
   UPLOAD_BIN_DIR: false
   UPLOAD_ZIP: true
   UPLOAD_FIRMWARE: true
