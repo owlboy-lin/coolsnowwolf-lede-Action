@@ -36,9 +36,9 @@ env:
   TARGET: x86
   SUBTARGET: 64
   SSH_ACTIONS: false
-  Gzip_file: false
+  Gzip_file: true
   UPLOAD_BIN_DIR: false
-  UPLOAD_ZIP: false
+  UPLOAD_ZIP: true
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
@@ -184,7 +184,7 @@ jobs:
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_ZIP == 'true'
         run: |
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          zip -rm -T ${{ env.FIRMWARE }}/${{ steps.rename.outputs.release_tag }}.zip *
+          zip -r -j ${{ env.FIRMWARE }}/${{ steps.rename.outputs.release_tag }}.zip *
           echo "::set-output name=status::success"   
      
       - name: Upload firmware directory
@@ -203,6 +203,7 @@ jobs:
 
       - name: Create release
         uses: softprops/action-gh-release@v1
+        if: env.UPLOAD_RELEASE == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
