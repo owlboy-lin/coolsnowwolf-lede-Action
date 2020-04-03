@@ -38,9 +38,9 @@ env:
   SSH_ACTIONS: false
   Gzip_file: false
   UPLOAD_BIN_DIR: false
-  UPLOAD_ZIP: true
+  UPLOAD_ZIP: false
   UPLOAD_FIRMWARE: true
-  UPLOAD_RELEASE: true
+  UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
 
   
@@ -190,7 +190,7 @@ jobs:
       - name: Upload firmware directory
         id: upload_firmware
         uses: actions/upload-artifact@master
-        if: steps.organize.outputs.status == 'success' && env.UPLOAD_ZIP == 'false' && !cancelled()
+        if: steps.organize.outputs.status == 'success' && env.UPLOAD_ZIP == 'false'
         with:
           name: ${{ steps.rename.outputs.release_tag }}
           # path: openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
