@@ -38,7 +38,7 @@ env:
   SSH_ACTIONS: false
   Gzip_file: false
   UPLOAD_BIN_DIR: false
-  UPLOAD_ZIP: false
+  UPLOAD_ZIP: true
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
@@ -184,7 +184,7 @@ jobs:
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_ZIP == 'true'
         run: |
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          zip -rm -T ${{ env.FIRMWARE }}/${{ steps.rename.outputs.release_tag }}.zip *
+          zip -r -j ${{ env.FIRMWARE }}/${{ steps.rename.outputs.release_tag }}.zip *
           echo "::set-output name=status::success"   
      
       - name: Upload firmware directory
