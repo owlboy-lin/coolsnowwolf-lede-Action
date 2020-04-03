@@ -190,7 +190,7 @@ jobs:
       - name: Upload firmware directory
         id: upload_firmware
         uses: actions/upload-artifact@master
-        if: steps.organize.outputs.status == 'success' && env.UPLOAD_ZIP == 'false'
+        if: steps.organize.outputs.status == 'success'
         with:
           name: ${{ steps.rename.outputs.release_tag }}
           # path: openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
