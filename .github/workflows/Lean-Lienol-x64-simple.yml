@@ -203,6 +203,7 @@ jobs:
 
       - name: Create release
         uses: softprops/action-gh-release@v1
+        if: env.UPLOAD_RELEASE == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
