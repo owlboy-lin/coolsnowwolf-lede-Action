@@ -149,7 +149,7 @@ jobs:
         if: steps.rename.outputs.status == 'success' && env.Gzip_file == 'true' 
         run: |
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          find . -name "*.img"|xargs -I {} tar zcvf {}.gz {}
+          gzip *.img
           # rm -f *.img
           echo "::set-output name=status::success"
   
