@@ -40,7 +40,7 @@ env:
   UPLOAD_BIN_DIR: false
   UPLOAD_ZIP: true
   UPLOAD_FIRMWARE: true
-  UPLOAD_RELEASE: false
+  UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
   
@@ -172,7 +172,7 @@ jobs:
           
       - name: Organize files
         id: organize
-        if: env.UPLOAD_FIRMWARE == 'true'
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true'
         run: |
           cd openwrt/bin/targets/*/*
           rm -rf packages
@@ -181,17 +181,17 @@ jobs:
      
       - name: Upload zip
         id: upload_zip
-        if: steps.organize.outputs.status == 'success' && env.UPLOAD_ZIP == 'true'
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_ZIP == 'true'
         run: |
-          rm -rf ./artifact/
-          mkdir -p ./artifact/
-          zip -r -j ${{ env.FIRMWARE }}/${{ steps.rename.outputs.release_tag }}.zip ./artifact/
+          rm -rf ./release/
+          mkdir -p ./release/
+          zip -r -j ${{ env.FIRMWARE }}/${{ steps.rename.outputs.release_tag }}.zip ./release/
           echo "::set-output name=status::success"   
      
       - name: Upload firmware directory
         id: upload_firmware
         uses: actions/upload-artifact@master
-        if: steps.organize.outputs.status == 'success'
+        if: steps.compile.outputs.status == 'success'
         with:
           name: ${{ steps.rename.outputs.release_tag }}
           # path: openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
@@ -204,7 +204,7 @@ jobs:
 
       - name: Create release
         uses: softprops/action-gh-release@v1
-        if: env.UPLOAD_RELEASE == 'true'
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
@@ -215,8 +215,8 @@ jobs:
 
       - name: Upload firmware to release
         uses: softprops/action-gh-release@v1
-        if: env.UPLOAD_RELEASE == 'true' 
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' 
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
-          files: ./artifact/*
+          files: ./release/*
