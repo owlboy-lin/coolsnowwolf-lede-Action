@@ -183,8 +183,9 @@ jobs:
         id: upload_zip
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_ZIP == 'true'
         run: |
-          cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          zip -r -j ${{ env.FIRMWARE }}/${{ steps.rename.outputs.release_tag }}.zip *
+          rm -rf ./artifact/
+          mkdir -p ./artifact/
+          zip -r -j ${{ env.FIRMWARE }}/${{ steps.rename.outputs.release_tag }}.zip ./artifact/
           echo "::set-output name=status::success"   
      
       - name: Upload firmware directory
@@ -218,4 +219,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
-          files: ${{ env.FIRMWARE }}/*
+          files: ./artifact/*
