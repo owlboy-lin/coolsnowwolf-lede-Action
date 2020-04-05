@@ -112,7 +112,7 @@ jobs:
           mkdir -p ./release/
           pwd
           cd release
-          pwd
+
     
       - name: Upload firmware directory
         id: upload_firmware
