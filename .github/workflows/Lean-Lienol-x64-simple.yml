@@ -183,10 +183,9 @@ jobs:
         id: upload_zip
         if: steps.compile.outputs.status == 'success' && env.UPLOAD_ZIP == 'true'
         run: |
-          cd openwrt/
           rm -rf ./release/
           mkdir -p ./release/
-          cd openwrt/release/
+          cd openwrt/release
           zip -r -j ${{ steps.rename.outputs.release_tag }}.zip openwrt/bin/targets/$TARGET/$SUBTARGET/*
           echo "::set-output name=status::success"   
      
