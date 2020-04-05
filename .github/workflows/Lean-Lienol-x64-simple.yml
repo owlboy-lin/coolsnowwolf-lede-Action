@@ -185,8 +185,8 @@ jobs:
         run: |
           rm -rf ./release/
           mkdir -p ./release/
-          cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          zip -r -j ./release/${{ steps.rename.outputs.release_tag }}.zip *
+          cd openwrt/bin/targets/$TARGET/$SUBTARGET/
+          zip -r -j ./release/${{ steps.rename.outputs.release_tag }}.zip ./*
           echo "::set-output name=status::success"   
      
       - name: Upload firmware directory
