@@ -111,7 +111,7 @@ jobs:
           rm -rf ./release/
           mkdir -p ./release/
           pwd
-          cd openwrt/release
+          cd release
           pwd
     
       - name: Upload firmware directory
