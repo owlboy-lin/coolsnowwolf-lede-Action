@@ -103,11 +103,6 @@ jobs:
           chmod +x $DIY_SH
           cd openwrt
           ../$DIY_SH
-
-      - name: Extract Gz Files
-        id: extract
-        run: |
-          PWD
      
       - name: Upload zip
         id: upload_zip
