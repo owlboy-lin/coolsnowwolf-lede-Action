@@ -185,6 +185,7 @@ jobs:
         run: |
           rm -rf ./release/
           mkdir -p ./release/
+          pwd
           cd openwrt/release
           zip -r -j ${{ steps.rename.outputs.release_tag }}.zip openwrt/bin/targets/$TARGET/$SUBTARGET/*
           echo "::set-output name=status::success"   
