@@ -20,7 +20,7 @@ on:
     branches: 
       - master
     paths:
- #     - '.github/workflows/Lean-Lienol-x64-simple-ssr.yml'
+      - '.github/workflows/Lean-Lienol-x64-simple-ssr.yml'
       - 'Lean-Lienol-x64-simple-ssr'
 
   watch:
@@ -107,12 +107,13 @@ jobs:
       - name: Extract Gz Files
         id: extract
         run: |
+          PWD
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          
+          PWD
          
       - name: Organize files
         id: organize
-        if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true'
+        if: env.UPLOAD_FIRMWARE == 'true'
         run: |
           cd openwrt/bin/targets/*/*
           rm -rf packages
