@@ -39,7 +39,7 @@ env:
   Gzip_file: true
   UPLOAD_BIN_DIR: false
   UPLOAD_ZIP: true
-  UPLOAD_FIRMWARE: true
+  UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
@@ -206,12 +206,11 @@ jobs:
 
       - name: Create release
         uses: softprops/action-gh-release@v1
-        if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
           tag_name: ${{ env.date_TAG }}
-          release_name: ${{ steps.rename.outputs.release_tag }}
           body: 🚀 Automated build | 自动编译
 
 
