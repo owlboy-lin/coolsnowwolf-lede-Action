@@ -30,17 +30,17 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  FIRMWARE_NAME: Lean-Lienol-x64-simple-ssr
-  CONFIG_FILE: Lean-Lienol-x64-simple-ssr
+  FIRMWARE_NAME: Lean-Lienol-x64-simple
+  CONFIG_FILE: Lean-Lienol-x64-simple
   DIY_SH: diy.sh
   TARGET: x86
   SUBTARGET: 64
   SSH_ACTIONS: false
   Gzip_file: true
   UPLOAD_BIN_DIR: false
-  UPLOAD_ZIP: true
-  UPLOAD_FIRMWARE: true
-  UPLOAD_RELEASE: true
+  UPLOAD_ZIP: false
+  UPLOAD_FIRMWARE: false
+  UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
 
   
@@ -103,20 +103,121 @@ jobs:
           chmod +x $DIY_SH
           cd openwrt
           ../$DIY_SH
+
+      - name: Download package
+        id: package
+        run: |
+          cd openwrt
+          make defconfig
+          make download -j8
+          find dl -size -1024c -exec ls -l {} \;
+          find dl -size -1024c -exec rm -f {} \;
+
+      - name: Compile the firmware
+        id: compile
+        run: |
+          cd openwrt
+          echo -e "$(nproc) thread compile"
+          make -j$(nproc) || make -j1 V=s
+          echo "::set-output name=status::success"
+      
+      - name: Extract Gz Files
+        id: extract
+        if: steps.compile.outputs.status == 'success'
+        run: |
+          cd openwrt/bin/targets/$TARGET/$SUBTARGET
+          gzip -qd *.img.gz  || true
+          rm -f *.img.gz
+          echo "::set-output name=status::success" 
+          
+      - name: rename For file
+        id: rename
+        if: steps.extract.outputs.status == 'success'
+        run: |
+          cd openwrt/bin/targets/$TARGET/$SUBTARGET
+          release_tag="${FIRMWARE_NAME}-$(TZ=UTC-8 date +%Y.%m.%d-%H%M%S)"
+          for i in openwrt*; do mv -f $i `echo $i | sed "s/^openwrt-${{ env.TARGET }}-${{ env.SUBTARGET }}/${release_tag}/"`; done
+          echo "::set-output name=status::success"
+          echo "##[set-output name=release_tag;]$release_tag"
+      
+#      - name: SSH connection to Actions
+#        uses: owlboy-lin/debugger-action@master
+#        if: env.SSH_ACTIONS == 'true'      
+    
+      - name: Gz Files
+        id: Gzip_file
+        if: steps.rename.outputs.status == 'success' && env.Gzip_file == 'true' 
+        run: |
+          cd openwrt/bin/targets/$TARGET/$SUBTARGET
+          gzip *.img
+          # rm -f *.img
+          echo "::set-output name=status::success"
+  
+      - name: Generate Sha256sum File For Images
+        run: |
+          cd openwrt/bin/targets/$TARGET/$SUBTARGET
+          mv sha256sums sha256sums.orig
+          sha256sum *.* > sha256sums
+
+      - name: SSH connection to Actions
+        uses: owlboy-lin/debugger-action@master
+        if: env.SSH_ACTIONS == 'true'
+          
+      - name: Upload bin directory
+        uses: actions/upload-artifact@master
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+        with:
+          name: openwrt-bin
+          path: openwrt/bin/
+          
+      - name: Organize files
+        id: organize
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true'
+        run: |
+          cd openwrt/bin/targets/*/*
+          rm -rf packages
+          echo "::set-env name=FIRMWARE::$PWD"
+          echo "::set-output name=status::success"
      
       - name: Upload zip
         id: upload_zip
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_ZIP == 'true'
         run: |
           cd openwrt
           rm -rf ./release/
           mkdir -p ./release/
-          pwd
           cd release
-
-    
+          zip -r -j ${{ steps.rename.outputs.release_tag }}.zip ${{ env.FIRMWARE }}/*
+          echo "::set-output name=status::success"   
+     
       - name: Upload firmware directory
         id: upload_firmware
-        run: |
-          cd ${{ env.FIRMWARE }}
-          PWD
+        uses: actions/upload-artifact@master
+        if: steps.compile.outputs.status == 'success'
+        with:
+          name: ${{ steps.rename.outputs.release_tag }}
+          # path: openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
+          path: ${{ env.FIRMWARE }}
 
+
+      - name: Generate tag
+        run: |
+          echo ::set-env name=date_TAG::"$(TZ=UTC-8 date +"%Y.%m.%d-%H%M%S")"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
+        with:
+          tag_name: ${{ env.date_TAG }}
+          body: 🚀 Automated build | 自动编译
+
+
+      - name: Upload firmware to release
+        uses: softprops/action-gh-release@v1
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' 
+        env:
+          GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
+        with:
+          files: ./release/*
