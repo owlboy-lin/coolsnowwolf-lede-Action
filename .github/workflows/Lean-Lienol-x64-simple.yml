@@ -20,7 +20,7 @@ on:
     branches: 
       - master
     paths:
- #     - '.github/workflows/Lean-Lienol-x64-simple.yml'
+      - '.github/workflows/Lean-Lienol-x64-simple.yml'
       - 'Lean-Lienol-x64-simple'
 
   watch:
@@ -189,7 +189,11 @@ jobs:
           cd release
           zip -r -j ${{ steps.rename.outputs.release_tag }}.zip ${{ env.FIRMWARE }}/*
           echo "::set-output name=status::success"   
-     
+
+      - name: SSH connection to Actions
+        uses: owlboy-lin/debugger-action@master
+        if: env.SSH_ACTIONS == 'true'      
+
       - name: Upload firmware directory
         id: upload_firmware
         uses: actions/upload-artifact@master
