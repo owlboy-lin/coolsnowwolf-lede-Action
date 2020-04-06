@@ -183,7 +183,7 @@ jobs:
           rm -rf ./release/
           mkdir -p ./release/
           cd release
-          zip -r -j ${{ steps.rename.outputs.release_tag }}.zip '${{ env.FIRMWARE }}/*'
+          zip -r -j ${{ steps.rename.outputs.release_tag }}.zip ${{ env.FIRMWARE }}
           echo "::set-output name=status::success"   
 
       - name: SSH connection to Actions
