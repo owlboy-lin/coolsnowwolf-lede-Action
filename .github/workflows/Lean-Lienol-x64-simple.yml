@@ -35,7 +35,7 @@ env:
   DIY_SH: diy.sh
   TARGET: x86
   SUBTARGET: 64
-  SSH_ACTIONS: false
+  SSH_ACTIONS: true
   Gzip_file: true
   UPLOAD_BIN_DIR: false
   UPLOAD_ZIP: true
