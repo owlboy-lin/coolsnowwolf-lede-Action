@@ -130,7 +130,7 @@ jobs:
           rm -f *.img.gz
           echo "::set-output name=status::success" 
           
-      - name: rename For file
+      - name: Rename for file
         id: rename
         if: steps.extract.outputs.status == 'success'
         run: |
@@ -158,10 +158,6 @@ jobs:
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
           mv sha256sums sha256sums.orig
           sha256sum *.* > sha256sums
-
-      - name: SSH connection to Actions
-        uses: owlboy-lin/debugger-action@master
-        if: env.SSH_ACTIONS == 'true'
           
       - name: Upload bin directory
         uses: actions/upload-artifact@master
