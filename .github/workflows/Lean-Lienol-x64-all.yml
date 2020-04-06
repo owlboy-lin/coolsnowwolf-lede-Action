@@ -5,7 +5,7 @@
 # Author: P3TERX
 # Blog: https://p3terx.com
 #=================================================
-name: Lean-Lienol-x64-simple-all
+name: Lean-Lienol-x64-all
 
 
 on:
@@ -20,9 +20,8 @@ on:
     branches: 
       - master
     paths:
-      - '.github/workflows/Lean-Lienol-x64-simple-all.yml'
-      - 'Lean-Lienol-x64-simple-all'
-
+#      - '.github/workflows/Lean-Lienol-x64-all.yml'
+      - 'Lean-Lienol-x64-all'
   watch:
     types: [started]
 
@@ -30,8 +29,8 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  FIRMWARE_NAME: Lean-Lienol-x64-simple
-  CONFIG_FILE: Lean-Lienol-x64-simple
+  FIRMWARE_NAME: Lean-Lienol-x64-all
+  CONFIG_FILE: Lean-Lienol-x64-all
   DIY_SH: diy.sh
   TARGET: x86
   SUBTARGET: 64
