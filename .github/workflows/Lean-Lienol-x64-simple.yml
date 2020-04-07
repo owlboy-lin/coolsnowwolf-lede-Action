@@ -182,7 +182,7 @@ jobs:
           cd openwrt
           rm -rf ./release/
           mkdir -p ./release/
-          zip -r -b<./release/> ${{ steps.rename.outputs.release_tag }}.zip openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/  || true
+          zip -rj ./release/${{ steps.rename.outputs.release_tag }}.zip openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/  || true
           echo "::set-output name=status::success"   
 
       - name: SSH connection to Actions
