@@ -136,7 +136,7 @@ jobs:
         run: |
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
           release_tag="${FIRMWARE_NAME}-$(TZ=UTC-8 date +%Y.%m.%d-%H%M%S)"
-          for i in openwrt*; do mv -f $i `echo $i | sed "s/^openwrt-${{ env.TARGET }}-${{ env.SUBTARGET }}/${release_tag}/"`; done
+          for i in openwrt*; do mv -f $i `echo $i | sed "s/^openwrt-${{ env.TARGET }}/${release_tag}/"`; done
           echo "::set-output name=status::success"
           echo "##[set-output name=release_tag;]$release_tag"
       
