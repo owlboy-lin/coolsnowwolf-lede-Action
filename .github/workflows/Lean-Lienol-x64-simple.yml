@@ -183,6 +183,7 @@ jobs:
           rm -rf ./release/
           mkdir -p ./release/
           zip -rj -y ./release/${{ steps.rename.outputs.release_tag }}.zip -i openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
+          echo "::set-env name=RELEASE::$PWD"
           echo "::set-output name=status::success"   
 
       - name: SSH connection to Actions
@@ -219,4 +220,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
-          files: ./release/*
+          files: ${{ env.RELEASE }}/*.zip
