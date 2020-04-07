@@ -149,7 +149,7 @@ jobs:
         if: steps.rename.outputs.status == 'success' && env.Gzip_file == 'true' 
         run: |
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          gzip *.img
+          gzip *.img || true
           # rm -f *.img
           echo "::set-output name=status::success"
   
@@ -182,7 +182,7 @@ jobs:
           cd openwrt
           rm -rf ./release/
           mkdir -p ./release/
-          zip -r -j ./release/${{ steps.rename.outputs.release_tag }}.zip openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/*
+          zip -r ./release/${{ steps.rename.outputs.release_tag }}.zip -i openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/*  || true
           echo "::set-output name=status::success"   
 
       - name: SSH connection to Actions
