@@ -135,14 +135,11 @@ jobs:
           rm -rf ./release/
           mkdir -p ./release/
           cd bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
-          zip -r -j openwrt/release/${{ steps.rename.outputs.release_tag }}.zip * || true
+          zip -r -j openwrt/release/${{ env.DATE }}.zip * || true
           cd openwrt/release
           echo "::set-env name=RELEASE::$PWD"
           echo "::set-output name=status::success" 
           
-      - name: Generate tag
-        run: |
-          echo ::set-env name=date_TAG::"$(TZ=UTC-8 date +"%Y.%m.%d-%H%M%S")"
 
       - name: Create release
         uses: softprops/action-gh-release@v1
@@ -150,7 +147,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
-          tag_name: ${{ env.date_TAG }}
+          tag_name: ${{ env.DATE }}
           body: 🚀 Automated build | 自动编译
 
 
