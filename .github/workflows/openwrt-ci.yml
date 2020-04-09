@@ -121,3 +121,37 @@ jobs:
         with:
           name: OpenWrt_firmware
           path: openwrt/bin/targets/
+          
+      - name: Upload zip
+        id: upload_zip
+        if: env.UPLOAD_ZIP == 'true' && !cancelled()
+        run: |
+          cd openwrt
+          rm -rf ./release/
+          mkdir -p ./release/
+          cd openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
+          zip -r -j openwrt/release/${{ steps.rename.outputs.release_tag }}.zip * || true
+          cd openwrt/release
+          echo "::set-env name=RELEASE::$PWD"
+          echo "::set-output name=status::success" 
+          
+      - name: Generate tag
+        run: |
+          echo ::set-env name=date_TAG::"$(TZ=UTC-8 date +"%Y.%m.%d-%H%M%S")"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
+        with:
+          tag_name: ${{ env.date_TAG }}
+          body: 🚀 Automated build | 自动编译
+
+
+      - name: Upload firmware to release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
+        with:
+          files: ${{ env.RELEASE }}/*.zip
