@@ -63,7 +63,12 @@ jobs:
         uses: actions/checkout@master
         with:
           ref: master
-
+          
+      - name: Set Date
+        run: |
+           date=$(TZ=UTC-8 date +"%Y.%m.%d-%H%M%S")
+           echo "::set-env name=DATE::$date"
+         
       - name: Space cleanup
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -135,7 +140,7 @@ jobs:
         if: steps.extract.outputs.status == 'success'
         run: |
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          release_tag="${FIRMWARE_NAME}-$(TZ=UTC-8 date +%Y.%m.%d-%H%M%S)"
+          release_tag="${FIRMWARE_NAME}-${DATE}"
           for i in openwrt*; do mv -f $i `echo $i | sed "s/^openwrt-${{ env.TARGET }}-${{ env.SUBTARGET }}/${release_tag}/"`; done
           echo "::set-output name=status::success"
           echo "##[set-output name=release_tag;]$release_tag"
@@ -200,18 +205,13 @@ jobs:
           name: ${{ steps.rename.outputs.release_tag }}
           path: ${{ env.FIRMWARE }}
 
-
-      - name: Generate tag
-        run: |
-          echo ::set-env name=date_TAG::"$(TZ=UTC-8 date +"%Y.%m.%d-%H%M%S")"
-
       - name: Create release
         uses: softprops/action-gh-release@v1
         if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
-          tag_name: ${{ env.date_TAG }}
+          tag_name: ${{ env.DATE }}
           body: 🚀 Automated build | 自动编译
 
 
