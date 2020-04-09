@@ -129,7 +129,6 @@ jobs:
           
       - name: Upload zip
         id: upload_zip
-        if: env.UPLOAD_ZIP == 'true' && !cancelled()
         run: |
           cd openwrt
           rm -rf ./release/
