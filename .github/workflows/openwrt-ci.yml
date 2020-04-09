@@ -53,7 +53,12 @@ jobs:
         with:
           ref: master
           fetch-depth: 1000000
-
+          
+      - name: Set Date
+        run: |
+           date=$(TZ=UTC-8 date +"%Y.%m.%d-%H%M%S")
+           echo "::set-env name=DATE::$date"
+          
       - name: Space cleanup
         env:
           DEBIAN_FRONTEND: noninteractive
