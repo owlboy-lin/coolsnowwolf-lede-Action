@@ -128,9 +128,17 @@ jobs:
           cd openwrt
           find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
           
+      - name: Upload artifact
+        id: upload_artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{ env.FIRMWARE_NAME }}
+          path: ${{ env.FIRMWARE }}/
+             echo "::set-output name=status::success"
+          
       - name: Upload zip
         id: upload_zip
-        if: env.UPLOAD_ZIP == 'true' && !cancelled()
+        if: env.UPLOAD_ZIP == 'true' && steps.upload_artifact.outputs.status == 'success' && !cancelled()
         run: |
           cd openwrt
           rm -rf ./release/
@@ -140,12 +148,7 @@ jobs:
           echo "::set-env name=RELEASE::$PWD"
           echo "::set-output name=status::success"   
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@master
-        with:
-          name: ${{ env.FIRMWARE_NAME }}
-          path: ${{ env.FIRMWARE }}/
-          
+         
       - name: Release
         uses: softprops/action-gh-release@v1
         if: steps.upload_zip.outputs.status == 'success' && !cancelled()
