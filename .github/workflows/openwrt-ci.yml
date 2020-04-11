@@ -135,8 +135,7 @@ jobs:
           cd openwrt
           rm -rf ./release/
           mkdir -p ./release/
-          cd ${{ env.FIRMWARE }}
-          zip -r -j openwrt/release/${{ steps.rename.outputs.release_tag }}-${{ env.SUBTARGET }}.zip * || true
+          zip -r -j openwrt/release/${{ steps.rename.outputs.release_tag }}-${{ env.SUBTARGET }}.zip bin/targets/$TARGET/$SUBTARGET/* || true
           cd openwrt/release
           echo "::set-env name=RELEASE::$PWD"
           echo "::set-output name=status::success"   
@@ -149,7 +148,7 @@ jobs:
           
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: env.UPLOAD_ZIP == 'true' && !cancelled()
+        if: env.UPLOAD_ZIP == 'true' && steps.upload_zip.outputs.status == 'success' && !cancelled()
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
