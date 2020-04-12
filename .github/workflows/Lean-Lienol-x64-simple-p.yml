@@ -9,8 +9,8 @@ name: Lean-Lienol-x64-simple-p
 
 on:
 
-  schedule:
-    - cron: 0 20 * * *
+#  schedule:
+#    - cron: 0 20 * * *
 
 #  release:
 #    types: published
