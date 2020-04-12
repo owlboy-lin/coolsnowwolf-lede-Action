@@ -136,7 +136,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@master
         with:
-          name: ${{ env.release_tag }}
+          name: ${{ steps.rename.outputs.release_tag }}
           path: ${{ env.FIRMWARE }}/
           
       - name: Upload zip
@@ -145,7 +145,7 @@ jobs:
           cd openwrt
           rm -rf ./release/
           mkdir -p ./release/
-          zip -r -j release/${{ env.RELEASE_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true
+          zip -r -j release/${{ steps.rename.outputs.RELEASE_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true
           cd release
           echo "::set-env name=RELEASE::$PWD"
           echo "::set-output name=status::success" 
@@ -159,6 +159,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
-          tag_name: ${{ env.RELEASE_NAME }}
-          name: 自动发布 ${{ env.release_tag }}
+          tag_name: ${{ steps.rename.outputs.RELEASE_NAME }}
+          name: 自动发布 ${{ steps.rename.outputs.release_tag }}
           files: ${{ env.RELEASE }}/
