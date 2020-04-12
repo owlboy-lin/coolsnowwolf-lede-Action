@@ -27,7 +27,7 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  FIRMWARE_NAME: Lean-x64-simple
+  FIRMWARE_NAME: Lean
   CONFIG_FILE: Lean-x64-simple
   DIY_SH: diy.sh
   TARGET: x86
@@ -120,12 +120,24 @@ jobs:
         run: |
           cd openwrt
           find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
+          
+      - name: Rename for file
+        id: rename
+        run: |
+          cd openwrt/bin/targets/$TARGET/$SUBTARGET
+          release_tag="${FIRMWARE_NAME}-${DATE}"
+          for i in openwrt*; do mv -f $i `echo $i | sed "s/^openwrt/${release_tag}/"`; done
+          release_name="${DATE}-${FIRMWARE_NAME}-${SUBTARGET}"
+          echo "::set-env name=FIRMWARE::$PWD"
+          echo "##[set-output name=release_tag;]$release_tag"
+          echo "##[set-output name=RELEASE_NAME;]$release_name"
+          echo "::set-output name=status::success"
 
       - name: Upload artifact
         uses: actions/upload-artifact@master
         with:
-          name: OpenWrt_firmware
-          path: openwrt/bin/targets/
+          name: ${{ env.release_tag }}
+          path: ${{ env.FIRMWARE }}/
           
       - name: Upload zip
         id: upload_zip
@@ -133,16 +145,20 @@ jobs:
           cd openwrt
           rm -rf ./release/
           mkdir -p ./release/
-          zip -r -j release/${{ env.DATE }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true
+          zip -r -j release/${{ env.RELEASE_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true
           cd release
           echo "::set-env name=RELEASE::$PWD"
           echo "::set-output name=status::success" 
+          
+      - name: SSH connection to Actions
+        uses: owlboy-lin/debugger-action@master
+        if: env.SSH_ACTIONS == 'true'              
           
       - name: Upload firmware to release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
-          tag_name: ${{ env.DATE }}
-          name: ${{ env.FIRMWARE_NAME }}
+          tag_name: ${{ env.RELEASE_NAME }}
+          name: 自动发布 ${{ env.release_tag }}
           files: ${{ env.RELEASE }}/
