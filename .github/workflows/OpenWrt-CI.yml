@@ -17,7 +17,7 @@ on:
     branches: 
       - master
     paths:
-      - '.github/workflows/openwrt-ci.yml'
+      - '.github/workflows/OpenWrt-CI.yml'
       - 'LeanR9-x64-simple'
 
   watch:
@@ -145,4 +145,4 @@ jobs:
         with:
           tag_name: ${{ env.DATE }}
           name: ${{ env.FIRMWARE_NAME }}
-          files: ${{ env.RELEASE }}/*
+          files: ${{ env.RELEASE }}/
