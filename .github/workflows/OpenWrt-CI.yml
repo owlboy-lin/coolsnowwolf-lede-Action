@@ -18,7 +18,7 @@ on:
       - master
     paths:
       - '.github/workflows/OpenWrt-CI.yml'
-      - 'LeanR9-x64-simple'
+#      - 'LeanR9-x64-simple'
 
   watch:
     types: [started]
