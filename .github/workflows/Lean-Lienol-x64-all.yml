@@ -16,10 +16,10 @@ on:
 #  release:
 #    types: published
 
-  push:
-    branches: 
-      - master
-    paths:
+#  push:
+#    branches: 
+#      - master
+#    paths:
 #      - '.github/workflows/Lean-Lienol-x64-all.yml'
 #     - 'Lean-Lienol-x64-all'
 
