@@ -37,8 +37,8 @@ env:
   SUBTARGET: 64
   SSH_ACTIONS: false
   Gzip_file: true
-  UPLOAD_BIN_DIR: false
   UPLOAD_ZIP: true
+  UPLOAD_ALL: false
   UPLOAD_ORGANIZE: false
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
@@ -168,17 +168,10 @@ jobs:
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
           mv sha256sums sha256sums.orig
           sha256sum *.* > sha256sums
-          
-      - name: Upload bin directory
-        uses: actions/upload-artifact@master
-        if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
-        with:
-          name: openwrt-bin
-          path: openwrt/bin/
-          
+         
       - name: Organize files
         id: organize
-        if: env.UPLOAD_ORGANIZE == 'false' && !cancelled()
+        if: env.UPLOAD_ORGANIZE == 'false' 
         run: |
           # cd openwrt/bin/targets/*/*
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
@@ -199,7 +192,7 @@ jobs:
           cd openwrt
           rm -rf ./release/
           mkdir -p ./release/
-          zip -r -j release/${{ env.NEW_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true
+          zip -r release/${{ env.NEW_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true
           cd release
           echo "::set-env name=RELEASE::$PWD"
           echo "::set-output name=status::success"   
