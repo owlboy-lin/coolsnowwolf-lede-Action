@@ -163,4 +163,4 @@ jobs:
         with:
           tag_name: ${{ steps.rename.outputs.RELEASE_NAME }}
           name: 自动发布 ${{ steps.rename.outputs.release_tag }}
-          files: ${{ env.RELEASE }}/
+          files: ${{ env.RELEASE }}/*.zip
