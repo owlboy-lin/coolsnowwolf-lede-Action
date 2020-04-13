@@ -20,8 +20,8 @@ on:
     branches: 
       - master
     paths:
- #     - '.github/workflows/Lean-Lienol-x64-simple.yml'
- #     - 'Lean-Lienol-x64-simple'
+      - '.github/workflows/Lean-Lienol-x64-simple.yml'
+#      - 'Lean-Lienol-x64-simple'
 
   watch:
     types: [started]
