@@ -173,9 +173,8 @@ jobs:
         id: organize
         if: env.UPLOAD_ORGANIZE == 'false' 
         run: |
-          # cd openwrt/bin/targets/*/*
-          cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          rm -rf packages
+          cd openwrt
+          find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
           echo "::set-output name=status::success"
 
       - name: Upload firmware directory
