@@ -39,7 +39,7 @@ env:
   Gzip_file: true
   UPLOAD_BIN_DIR: false
   UPLOAD_ZIP: true
-  UPLOAD_FIRMWARE: false
+  UPLOAD_ORGANIZE: false
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
@@ -178,7 +178,7 @@ jobs:
           
       - name: Organize files
         id: organize
-        if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+        if: env.UPLOAD_ORGANIZE == 'false' && !cancelled()
         run: |
           # cd openwrt/bin/targets/*/*
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
