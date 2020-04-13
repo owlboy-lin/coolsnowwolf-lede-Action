@@ -21,7 +21,8 @@ on:
       - master
     paths:
 #      - '.github/workflows/Lean-Lienol-x64-all.yml'
-      - 'Lean-Lienol-x64-all'
+#     - 'Lean-Lienol-x64-all'
+
   watch:
     types: [started]
 

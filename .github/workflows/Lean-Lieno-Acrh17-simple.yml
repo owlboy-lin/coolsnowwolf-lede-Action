@@ -20,8 +20,8 @@ on:
     branches: 
       - master
     paths:
-      - '.github/workflows/Lean-Lieno-Acrh17-simple.yml'
-      - 'Lean-Lieno-Acrh17-simple'
+#      - '.github/workflows/Lean-Lieno-Acrh17-simple.yml'
+#      - 'Lean-Lieno-Acrh17-simple'
 
   watch:
     types: [started]
