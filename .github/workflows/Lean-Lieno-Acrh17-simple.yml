@@ -31,7 +31,7 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FIRMWARE_NAME: Lean-Lieno-Acrh17-simple
-  CONFIG_FILE: Lean-Lieno-Acrh17-simple
+  CONFIG_FILE: ASUS_RT-Acrh17(LL)-simple
   DIY_SH: diy.sh
   TARGET: ipq40xx
   SUBTARGET: generic
