@@ -21,7 +21,7 @@ on:
 #      - master
 #    paths:
 #      - '.github/workflows/Lean-Lieno-Acrh17-simple.yml'
-#      - 'Lean-Lieno-Acrh17-simple'
+#      - 'ASUS_RT-Acrh17(LL)-simple'
 
   watch:
     types: [started]
@@ -37,7 +37,7 @@ env:
   SUBTARGET: generic
   SSH_ACTIONS: false
   Gzip_file: true
-  UPLOAD_BIN_DIR: false
+  UPLOAD_ALL: false
   UPLOAD_ZIP: false
   UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
@@ -51,19 +51,34 @@ env:
   # UPLOAD_TMP_LINK: true
 
 
+
 jobs:
-  
+
   build:
-    
+
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@master
         with:
           ref: master
-
+          fetch-depth: 1000000
+          
+      - name: Set Date
+        run: |
+           date=$(TZ=UTC-8 date +"%Y.%m.%d-%H%M%S")
+           echo "::set-env name=DATE::$date"
+           
+      - name: new name
+        run : |
+           firmware_name="${FIRMWARE_NAME}-${DATE}"
+           release_name="${DATE}-${FIRMWARE_NAME}"
+           echo "::set-env name=NEW_NAME::$firmware_name"
+           echo "::set-env name=RELEASE_NAME::$release_name"
+           
+           
       - name: Space cleanup
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -72,10 +87,9 @@ jobs:
           sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
           sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
           sudo -E apt-get update
-          sudo -E apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python python3 python-pip python3-pip python-ply python3-ply haveged lrzsz device-tree-compiler scons antlr3 gperf* ecj fastjar
+          sudo -E apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
-
           # 利用挂载在 /mnt/ 的 14G 额外空间:
           # sudo mkdir -p -m 777 /mnt/openwrt/bin /mnt/openwrt/build_dir/host /mnt/openwrt/build_dir/hostpkg /mnt/openwrt/dl /mnt/openwrt/feeds /mnt/openwrt/staging_dir
           # ln -s /mnt/openwrt/bin ./bin
@@ -84,12 +98,10 @@ jobs:
           # ln -s /mnt/openwrt/dl ./dl
           # ln -s /mnt/openwrt/feeds ./feeds
           # ln -s /mnt/openwrt/staging_dir ./staging_dir
-
           df -h
-    
       - name: Clone source code
         run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
-
+        
       - name: Update feeds
         run: cd openwrt && ./scripts/feeds update -a
 
@@ -128,17 +140,16 @@ jobs:
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
           gzip -qd *.img.gz  || true
           rm -f *.img.gz
+          echo "::set-env name=FIRMWARE::$PWD"
           echo "::set-output name=status::success" 
           
-      - name: Rename for file
+      - name: Rename file
         id: rename
-        if: steps.extract.outputs.status == 'success'
         run: |
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          release_tag="${FIRMWARE_NAME}-$(TZ=UTC-8 date +%Y.%m.%d-%H%M%S)"
-          for i in openwrt*; do mv -f $i `echo $i | sed "s/^openwrt-${{ env.TARGET }}/${release_tag}/"`; done
+          for i in openwrt*; do mv -f $i `echo $i | sed "s/^openwrt-$TARGET-$SUBTARGET/${NEW_NAME}/"`; done
+          echo "::set-env name=FIRMWARE::$PWD"
           echo "::set-output name=status::success"
-          echo "##[set-output name=release_tag;]$release_tag"
       
 #      - name: SSH connection to Actions
 #        uses: owlboy-lin/debugger-action@master
@@ -149,7 +160,7 @@ jobs:
         if: steps.rename.outputs.status == 'success' && env.Gzip_file == 'true' 
         run: |
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          gzip *.img
+          gzip *.img || true
           # rm -f *.img
           echo "::set-output name=status::success"
   
@@ -158,67 +169,43 @@ jobs:
           cd openwrt/bin/targets/$TARGET/$SUBTARGET
           mv sha256sums sha256sums.orig
           sha256sum *.* > sha256sums
-          
-      - name: Upload bin directory
-        uses: actions/upload-artifact@master
-        if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
-        with:
-          name: openwrt-bin
-          path: openwrt/bin/
-          
+         
       - name: Organize files
         id: organize
-        if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
-        run: |
-          cd openwrt/bin/targets/*/*
-          rm -rf packages
-          echo "::set-env name=FIRMWARE::$PWD"
-          echo "::set-output name=status::success"
-     
-      - name: Upload zip
-        id: upload_zip
-        if: env.UPLOAD_ZIP == 'true' && !cancelled()
+        if: env.UPLOAD_ORGANIZE == 'false' 
         run: |
           cd openwrt
-          rm -rf ./release/
-          mkdir -p ./release/
-          zip -rj -y ./release/${{ steps.rename.outputs.release_tag }}.zip -i openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
-          cd openwrt/release
-          echo "::set-env name=RELEASE::$PWD"
-          echo "::set-output name=status::success" 
-
-      - name: SSH connection to Actions
-        uses: owlboy-lin/debugger-action@master
-        if: env.SSH_ACTIONS == 'true'      
+          find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
+          echo "::set-output name=status::success"
 
       - name: Upload firmware directory
         id: upload_firmware
         uses: actions/upload-artifact@master
         if: steps.compile.outputs.status == 'success'
         with:
-          name: ${{ steps.rename.outputs.release_tag }}
-          # path: openwrt/bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/
+          name: ${{ env.NEW_NAME }}
           path: ${{ env.FIRMWARE }}
 
-
-      - name: Generate tag
+      - name: Upload zip
+        id: upload_zip
         run: |
-          echo ::set-env name=date_TAG::"$(TZ=UTC-8 date +"%Y.%m.%d-%H%M%S")"
+          cd openwrt
+          rm -rf ./release/
+          mkdir -p ./release/
+          zip -r release/${{ env.NEW_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true
+          cd release
+          echo "::set-env name=RELEASE::$PWD"
+          echo "::set-output name=status::success"   
 
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && startsWith(github.ref, 'refs/tags/')
-        env:
-          GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
-        with:
-          tag_name: ${{ env.date_TAG }}
-          body: 🚀 Automated build | 自动编译
-
-
+      - name: SSH connection to Actions
+        uses: owlboy-lin/debugger-action@master
+        if: env.SSH_ACTIONS == 'true'      
+        
       - name: Upload firmware to release
         uses: softprops/action-gh-release@v1
-        if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' 
         env:
           GITHUB_TOKEN: ${{ secrets.all_TOKEN }}
         with:
-          files: ./release/*
+          tag_name: ${{ env.RELEASE_NAME }}
+          name: 自动发布 ${{ env.NEW_NAME }}
+          files: ${{ env.RELEASE }}/*
