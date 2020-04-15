@@ -32,7 +32,7 @@ env:
   SUBTARGET: generic
   CONFIG_FILE: Lean-x64-simple
   DIY_SH: diy.sh
-  SSH_ACTIONS: false
+  SSH_ACTIONS: true
   Gzip_file: true
   UPLOAD_ALL: false
   UPLOAD_ZIP: true
@@ -298,7 +298,7 @@ jobs:
   
       - name: Generate Sha256sum File For Images
         run: |
-          cd openwrt/bin/targets/$TARGET/$SUBTARGET
+          cd openwrt/bin/targets/*/*
           mv sha256sums sha256sums.orig
           sha256sum *.* > sha256sums
          
