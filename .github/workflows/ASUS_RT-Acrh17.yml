@@ -27,7 +27,7 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  FIRMWARE_NAME: ASUS_RT-Acrh17
+  FIRMWARE_NAME: Lean
   TARGET: ipq40xx
   SUBTARGET: generic
   CONFIG_FILE: Lean-x64-simple
@@ -265,9 +265,9 @@ jobs:
 
       - name: Extract Gz Files
         id: extract
-        if: steps.compile.outputs.status == 'success'
+        if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
-          cd openwrt/bin/targets/*/*
+          cd openwrt/bin/targets/${TARGET}/${SUBTARGET}
           gzip -qd *.img.gz  || true
           rm -f *.img.gz
           echo "::set-env name=FIRMWARE::$PWD"
@@ -275,9 +275,10 @@ jobs:
           
       - name: Rename file
         id: rename
+        if: steps.compile.outputs.status == 'success'  && !cancelled()
         run: |
-          cd openwrt/bin/targets/*/*
-          for i in openwrt*; do mv -f $i `echo $i | sed "s/^openwrt-$TARGET-$SUBTARGET/${NEW_NAME}/"`; done
+          cd openwrt/bin/targets/${TARGET}/${SUBTARGET}
+          for i in openwrt*; do mv -f $i `echo $i | sed "s/^openwrt/${NEW_NAME}/"`; done
           echo "::set-env name=FIRMWARE::$PWD"
           echo "::set-output name=status::success"
       
@@ -287,7 +288,7 @@ jobs:
     
       - name: Gz Files
         id: Gzip_file
-        if: steps.rename.outputs.status == 'success' && env.Gzip_file == 'true' 
+        if: env.Gzip_file == 'true' && !cancelled()
         run: |
           cd openwrt/bin/targets/*/*
           gzip *.img || true
@@ -296,13 +297,13 @@ jobs:
   
       - name: Generate Sha256sum File For Images
         run: |
-          cd openwrt/bin/targets/*/*
+          cd openwrt/bin/targets/${TARGET}/${SUBTARGET}
           mv sha256sums sha256sums.orig
           sha256sum *.* > sha256sums
          
       - name: Organize files
         id: organize
-        if: env.UPLOAD_ORGANIZE == 'false' 
+        if: env.UPLOAD_ORGANIZE == 'false' && !cancelled()
         run: |
           cd openwrt
           find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
@@ -311,13 +312,14 @@ jobs:
       - name: Upload firmware directory
         id: upload_firmware
         uses: actions/upload-artifact@master
-        if: steps.compile.outputs.status == 'success'
+        if: steps.compile.outputs.status == 'success'  && !cancelled()
         with:
           name: ${{ env.NEW_NAME }}
           path: ${{ env.FIRMWARE }}
 
       - name: Upload zip
         id: upload_zip
+        if: steps.compile.outputs.status == 'success'  && !cancelled()
         run: |
           cd openwrt
           rm -rf ./release/
