@@ -16,7 +16,7 @@ on:
   push:
     branches: 
       - master
-    paths:
+#    paths:
       - '.github/workflows/Newifi-D2.yml'
 #      - 'LeanR9-x64-simple'
 
