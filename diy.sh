@@ -14,3 +14,6 @@ mkdir package/Lienol
 cd package/Lienol
 git clone https://github.com/project-openwrt/openwrt-package.git
 
+mkdir package/ssrplus
+cd package/ssrplus
+git clone https://github.com/fw876/helloworld
