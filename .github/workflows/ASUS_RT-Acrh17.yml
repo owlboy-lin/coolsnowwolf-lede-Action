@@ -303,7 +303,7 @@ jobs:
   
       - name: Generate Sha256sum File For Images
         run: |
-          cd openwrt/bin/targets/$TARGET/$SUBTARGET
+          cd openwrt/bin/targets/*/*
           mv sha256sums sha256sums.orig
           sha256sum *.* > sha256sums
          
