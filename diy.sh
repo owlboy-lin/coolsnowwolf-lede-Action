@@ -8,12 +8,11 @@
 # Modify default IP
 #sed -i 's/192.168.1.1/192.168.50.5/g' package/base-files/files/bin/config_generate
 
-
-# Clone community packages to package/community
-mkdir package/Lienol
-cd package/Lienol
-git clone https://github.com/project-openwrt/openwrt-package.git
-
-mkdir package/ssrplus
-cd package/ssrplus
-git clone https://github.com/fw876/helloworld
+# Import external feeds
+git clone https://github.com/superstarfly/openwrt-package package/lienol
+git clone https://github.com/vernesong/OpenClash package/openclash
+git clone https://github.com/tzxiaozhen88/luci-app-koolproxyR package/koolproxyR
+git clone https://github.com/rufengsuixing/luci-app-adguardhome package/adguardhome
+git clone https://github.com/frainzy1477/luci-app-clash package/clash
+git clone https://github.com/fw876/helloworld package/ssrplus
+# git clone 其他github插件源码地址 package/文件夹名称
