@@ -145,21 +145,28 @@ jobs:
           # CONFIG_TARGET_x86_64=y
           # CONFIG_TARGET_x86_64_Generic=y
           # EOF
-
-          # 编译ASUS_RT-Acrh17的固件:
-          cat >> .config <<EOF
-          CONFIG_TARGET_ramips=y
-          CONFIG_TARGET_ramips_mt7621=y
-          CONFIG_TARGET_ramips_mt7621_DEVICE_d-team_newifi-d2=y
-          EOF
-
+          
           # 编译ASUS_RT-Acrh17的固件:
           # cat >> .config <<EOF
           # CONFIG_TARGET_ipq40xx=y
           # CONFIG_TARGET_ipq40xx_DEVICE_asus_rt-acrh17=y
           # CONFIG_TARGET_BOARD="ipq40xx"
           # EOF
-
+          
+          # 编译Newifi-D2的固件:
+          cat >> .config <<EOF
+          CONFIG_TARGET_ramips=y
+          CONFIG_TARGET_ramips_mt7621=y
+          CONFIG_TARGET_ramips_mt7621_DEVICE_d-team_newifi-d2=y
+          EOF
+          
+          # 编译R619ac-128m的固件:
+          # cat >> .config <<EOF
+          # CONFIG_TARGET_ipq40xx=y
+          # CONFIG_TARGET_ipq40xx_DEVICE_p2w_r619ac-128m=y
+          # CONFIG_TARGET_BOARD="ipq40xx"
+          # EOF
+       
           # 编译K3的固件:
           # cat >> .config <<EOF
           # CONFIG_TARGET_bcm53xx=y
