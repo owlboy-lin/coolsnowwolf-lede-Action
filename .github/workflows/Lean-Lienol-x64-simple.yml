@@ -31,18 +31,21 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  FIRMWARE_NAME: Lean-Lienol-x64-simple
-  CONFIG_FILE: Lean-Lienol-x64-simple
-  DIY_SH: diy.sh
+  FIRMWARE_NAME: Lean-x64-simple
   TARGET: x86
   SUBTARGET: 64
-  SSH_ACTIONS: false
-  Gzip_file: true
-  UPLOAD_ZIP: true
+  CONFIG_FILE: 
+  DIY_SH: diy.sh
   UPLOAD_ALL: false
-  UPLOAD_ORGANIZE: false
+  SSH_ACTIONS: false
+  extract:  false
+  rename: true
+  Gzip_file: false
+  UPLOAD_ZIP: true
+  UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
+
 
   
   # FREE_UP_DISK: true
@@ -133,6 +136,14 @@ jobs:
           make -j$(nproc) || make -j1 V=s
           echo "::set-output name=status::success"
       
+      - name: UPLOAD_ALL
+        id: UPLOAD_ALL
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_ALL == 'false'
+        run: |
+          cd openwrt
+          find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
+          echo "::set-output name=status::success"
+      
       - name: Extract Gz Files
         id: extract
         if: steps.compile.outputs.status == 'success'
@@ -170,14 +181,6 @@ jobs:
           mv sha256sums sha256sums.orig
           sha256sum *.* > sha256sums
          
-      - name: Organize files
-        id: organize
-        if: env.UPLOAD_ORGANIZE == 'false' 
-        run: |
-          cd openwrt
-          find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
-          echo "::set-output name=status::success"
-
       - name: Upload firmware directory
         id: upload_firmware
         uses: actions/upload-artifact@master
@@ -188,14 +191,26 @@ jobs:
 
       - name: Upload zip
         id: upload_zip
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_ZIP == 'true' && env.UPLOAD_ALL == 'true' 
         run: |
           cd openwrt
           rm -rf ./release/
           mkdir -p ./release/
-          zip -r -j release/${{ env.NEW_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true
+          zip -r -j release/${{ env.NEW_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true           
           cd release
           echo "::set-env name=RELEASE::$PWD"
           echo "::set-output name=status::success"   
+          
+      - name: Upload zip
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_ZIP == 'true' && env.UPLOAD_ALL == 'false' 
+        run: |
+          cd openwrt
+          rm -rf ./release/
+          mkdir -p ./release/
+          zip -r release/${{ env.NEW_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true           
+          cd release
+          echo "::set-env name=RELEASE::$PWD"
+          echo "::set-output name=status::success" 
 
       - name: SSH connection to Actions
         uses: owlboy-lin/debugger-action@master
