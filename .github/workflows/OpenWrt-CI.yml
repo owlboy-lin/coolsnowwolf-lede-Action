@@ -104,10 +104,10 @@ jobs:
 
       - name: Generate configuration file
         run:  |
-          cd openwrt
-          make defconfig
-          chmod +x ./$DIY_SH
-          ./$DIY_SH
+         chmod +x $DIY_SH
+         cd openwrt
+         ../$DIY_SH
+         make defconfig
 
       - name: Make download
         run: |
