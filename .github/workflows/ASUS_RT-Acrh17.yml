@@ -18,7 +18,7 @@ on:
       - master
     paths:
       - '.github/workflows/ASUS_RT-Acrh17.yml'
-#      - 'LeanR9-x64-simple'
+#      - 'ASUS_RT-Acrh17(LL)-simple-ssr'
 
   watch:
     types: [started]
@@ -30,7 +30,7 @@ env:
   FIRMWARE_NAME: ASUS_RT-Acrh17-lean
   TARGET: ipq40xx
   SUBTARGET: generic
-  CONFIG_FILE: Lean-x64-simple
+  CONFIG_FILE: ASUS_RT-Acrh17(LL)-simple-ssr
   DIY_SH: diy.sh
   UPLOAD_ALL: false
   SSH_ACTIONS: false
