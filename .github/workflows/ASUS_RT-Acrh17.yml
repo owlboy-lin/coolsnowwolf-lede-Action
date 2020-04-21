@@ -18,7 +18,7 @@ on:
       - master
     paths:
       - '.github/workflows/ASUS_RT-Acrh17.yml'
-#      - 'ASUS_RT-Acrh17(LL)-simple-ssr'
+#      - 'LeanR9-x64-simple'
 
   watch:
     types: [started]
@@ -27,10 +27,10 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  FIRMWARE_NAME: ASUS_RT-Acrh17-lean
+  FIRMWARE_NAME: ASUS_RT-Acrh17
   TARGET: ipq40xx
   SUBTARGET: generic
-  CONFIG_FILE: ASUS_RT-Acrh17(LL)-simple-ssr
+  CONFIG_FILE: Lean-x64-simple
   DIY_SH: diy.sh
   UPLOAD_ALL: false
   SSH_ACTIONS: false
@@ -145,28 +145,14 @@ jobs:
           # CONFIG_TARGET_x86_64=y
           # CONFIG_TARGET_x86_64_Generic=y
           # EOF
-          
+
           # 编译ASUS_RT-Acrh17的固件:
           cat >> .config <<EOF
           CONFIG_TARGET_ipq40xx=y
           CONFIG_TARGET_ipq40xx_DEVICE_asus_rt-acrh17=y
           CONFIG_TARGET_BOARD="ipq40xx"
           EOF
-          
-          # 编译Newifi-D2的固件:
-          # cat >> .config <<EOF
-          # CONFIG_TARGET_ramips=y
-          # CONFIG_TARGET_ramips_mt7621=y
-          # CONFIG_TARGET_ramips_mt7621_DEVICE_d-team_newifi-d2=y
-          # EOF
-          
-          # 编译R619ac-128m的固件:
-          # cat >> .config <<EOF
-          # CONFIG_TARGET_ipq40xx=y
-          # CONFIG_TARGET_ipq40xx_DEVICE_p2w_r619ac-128m=y
-          # CONFIG_TARGET_BOARD="ipq40xx"
-          # EOF
-       
+
           # 编译K3的固件:
           # cat >> .config <<EOF
           # CONFIG_TARGET_bcm53xx=y
@@ -257,10 +243,6 @@ jobs:
 
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
-          cd ..
-          chmod +x $DIY_SH
-          cd openwrt
-          ../$DIY_SH
 
       - name: Download package
         id: package
@@ -283,7 +265,7 @@ jobs:
           
       - name: UPLOAD_ALL
         id: UPLOAD_ALL
-        if: steps.compile.outputs.status == 'success' && env.UPLOAD_ALL == 'true' && !cancelled()
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_ALL == 'false' && !cancelled()
         run: |
           cd openwrt
           find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
@@ -293,7 +275,7 @@ jobs:
         id: extract
         if: steps.compile.outputs.status == 'success' && env.extract == 'true'
         run: |
-          cd openwrt/bin/targets/$TARGET/$SUBTARGET
+          cd openwrt/bin/targets/*/*
           gzip -qd *.img.gz  || true
           rm -f *.img.gz
           echo "::set-output name=status::success" 
@@ -302,7 +284,7 @@ jobs:
         id: rename
         if: env.rename == 'true' && steps.compile.outputs.status == 'success' 
         run: |
-          cd openwrt/bin/targets/$TARGET/$SUBTARGET
+          cd openwrt/bin/targets/*/*
           for i in openwrt*; do mv -f $i `echo $i | sed "s/^openwrt-$TARGET-$SUBTARGET/${NEW_NAME}/"`; done || true
           echo "::set-output name=status::success"
       
