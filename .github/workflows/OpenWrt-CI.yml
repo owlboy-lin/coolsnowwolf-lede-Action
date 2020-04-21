@@ -106,9 +106,8 @@ jobs:
         run:  |
           cd openwrt
           make defconfig
-          chmod +x $DIY_SH
-          cd openwrt
-          ../$DIY_SH
+          chmod +x ./$DIY_SH
+          ./$DIY_SH
 
       - name: Make download
         run: |
