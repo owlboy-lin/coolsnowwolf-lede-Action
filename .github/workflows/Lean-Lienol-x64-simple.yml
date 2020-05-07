@@ -196,7 +196,7 @@ jobs:
           cd openwrt
           rm -rf ./release/
           mkdir -p ./release/
-          zip -r -j release/${{ env.NEW_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true           
+          zip -r release/${{ env.NEW_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true           
           cd release
           echo "::set-env name=RELEASE::$PWD"
           echo "::set-output name=status::success"   
@@ -207,7 +207,7 @@ jobs:
           cd openwrt
           rm -rf ./release/
           mkdir -p ./release/
-          zip -r release/${{ env.NEW_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true           
+          zip -r -j release/${{ env.NEW_NAME }}.zip bin/targets/${{ env.TARGET }}/${{ env.SUBTARGET }}/* || true           
           cd release
           echo "::set-env name=RELEASE::$PWD"
           echo "::set-output name=status::success" 
