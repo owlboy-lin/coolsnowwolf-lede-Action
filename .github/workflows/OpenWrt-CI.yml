@@ -11,7 +11,7 @@ name: OpenWrt-CI
 
 on:
   schedule:
-    - cron: 0 20 * * *
+    - cron: 0 20 * * 3
       
   push:
     branches: 
@@ -67,6 +67,7 @@ jobs:
            echo "::set-env name=RELEASE_NAME::$release_name"
            
            
+
       - name: Space cleanup
         env:
           DEBIAN_FRONTEND: noninteractive
