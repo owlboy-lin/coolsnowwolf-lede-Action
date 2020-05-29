@@ -160,11 +160,11 @@ jobs:
           # rm -f *.img
           echo "::set-output name=status::success"
   
-      - name: Generate Sha256sum File For Images
-        run: |
-          cd openwrt/bin/targets/$TARGET/$SUBTARGET
-          mv sha256sums sha256sums.orig
-          sha256sum *.* > sha256sums
+#      - name: Generate Sha256sum File For Images
+#        run: |
+#          cd openwrt/bin/targets/$TARGET/$SUBTARGET
+#          mv sha256sums sha256sums.orig
+#          sha256sum *.* > sha256sums
          
           
       - name: Upload firmware directory
