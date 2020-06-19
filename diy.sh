@@ -11,6 +11,13 @@
 # Import external feeds
 git clone https://github.com/Lienol/openwrt-package.git package/lienol
 
+git clone https://github.com/kenzok8/openwrt-packages.git package/kenzok8
+
+# Add a feed source
+sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
+
+
+
 git clone https://github.com/openwrt-develop/luci-theme-atmaterial package/luci-theme-atmaterial
 
 git clone https://github.com/rosywrt/luci-theme-rosy package/luci-theme-rosy
