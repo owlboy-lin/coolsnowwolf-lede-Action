@@ -18,7 +18,6 @@ on:
       - master
     paths:
       - '.github/workflows/R619ac-128m.yml'
-#      - 'LeanR9-x64-simple'
 
   watch:
     types: [started]
@@ -30,7 +29,7 @@ env:
   FIRMWARE_NAME: R619ac-128m-lean
   TARGET: ipq40xx
   SUBTARGET: generic
-  CONFIG_FILE: Lean-x64-simple
+  CONFIG_FILE: .config-R619ac-128m
   DIY_SH: diy.sh
   UPLOAD_ALL: false
   SSH_ACTIONS: false
