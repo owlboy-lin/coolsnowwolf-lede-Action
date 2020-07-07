@@ -27,7 +27,7 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  FIRMWARE_NAME: Lean-2048
+  FIRMWARE_NAME: Openwrt-ci-Lean-2048
   TARGET: x86
   SUBTARGET: 64
   CONFIG_FILE: .config-2048
