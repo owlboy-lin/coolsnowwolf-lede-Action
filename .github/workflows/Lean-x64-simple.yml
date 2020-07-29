@@ -5,7 +5,7 @@
 # Author: P3TERX
 # Blog: https://p3terx.com
 #=================================================
-name: Lean-Lienol-x64-simple
+name: Lean-x64-simple
 
 
 on:
@@ -34,7 +34,7 @@ env:
   FIRMWARE_NAME: Lean-x64-simple
   TARGET: x86
   SUBTARGET: 64
-  CONFIG_FILE: x86-simple-config.seed
+  CONFIG_FILE: 
   DIY_SH: diy.sh
   UPLOAD_ALL: false
   SSH_ACTIONS: false
