@@ -20,7 +20,7 @@ on:
     branches: 
       - master
     paths:
-      - '.github/workflows/Lean-Lienol-x64-simple.yml'
+      - '.github/workflows/Lean-x64-simple.yml'
 #      - 'x86-simple-config.seed'
       - 'diy.sh'
 
